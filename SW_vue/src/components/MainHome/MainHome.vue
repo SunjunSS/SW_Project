@@ -4,7 +4,7 @@
 
 <script>
 import router from '../../router.js';
-import PagesHeader from '@/components/PagesHeader.vue';
+import PagesHeader from '@/components/Bar/PagesHeader.vue';
 
 export default {
   components: {

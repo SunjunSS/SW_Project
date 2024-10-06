@@ -8,7 +8,7 @@
 <script>
 import homeImage from '@/assets/home.png';
 import markerImage from '@/assets/marker.png';
-import PagesHeader from '@/components/PagesHeader.vue';
+import PagesHeader from '@/components/Bar/PagesHeader.vue';
 
 export default {
   name: 'KakaoMap',

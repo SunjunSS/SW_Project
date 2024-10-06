@@ -19,7 +19,7 @@
 </template>
 
 <script>
-import router from '../router.js';
+import router from '../../router.js';
 
 import headerImage from '@/assets/headerImage.png';
 import headerImage2 from '@/assets/headerImage2.png';
