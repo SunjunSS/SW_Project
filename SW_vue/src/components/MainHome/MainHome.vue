@@ -1,14 +1,18 @@
 <template>
-  <v-btn class="btn" @click="goToTestPage()">확인</v-btn>
+  <PagesHeader />
 </template>
 
 <script>
 import router from '../../router.js';
+import PagesHeader from '@/components/PagesHeader.vue';
 
 export default {
+  components: {
+    PagesHeader, // Register the PagesHeader component
+  },
   methods: {
-    goToTestPage() {
-      router.push('/test');
+    goToMapPage() {
+      router.push('/map');
     }
   }
 };
