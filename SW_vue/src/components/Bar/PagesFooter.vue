@@ -22,7 +22,6 @@
   align-items: center;
   justify-content: space-between;
   padding: 0 20px 0 20px;
-  margin-top: 150px;
 }
 
 .introduce {
