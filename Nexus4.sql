@@ -21,6 +21,7 @@ CREATE TABLE books (
     title VARCHAR(255) NOT NULL,
     item_page INT NOT NULL,
     author VARCHAR(255) NOT NULL,
+    ISBN VARCHAR(100) NOT NULL,
     pubdate DATE NOT NULL,
     description TEXT,
     price_standard INT NOT NULL,
