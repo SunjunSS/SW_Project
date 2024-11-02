@@ -49,13 +49,14 @@ import PagesHeader from '@/components/Bar/PagesHeader.vue';
 
 export default {
   components: {
-    PagesHeader, // PagesHeader 컴포넌트를 등록
+    PagesHeader,
   },
   data() {
     return {
       bookDetails: {},
       loading: true,
       error: null,
+      bookTitle: '', // 책 제목을 저장할 새로운 데이터 속성
     };
   },
   created() {
@@ -66,10 +67,14 @@ export default {
       this.loading = true;
       this.error = null;
       try {
+        // 서버에서 책 제목을 가져옴
+        const titleResponse = await axios.get('http://localhost:3000/api/book-title');
+        this.bookTitle = titleResponse.data.title; // 받아온 책 제목 저장
+
         const searchResponse = await axios.get('/api/ItemSearch.aspx', {
           params: {
             ttbkey: 'ttbzinzza1220952001',
-            Query: '미드나잇 라이브러리',
+            Query: this.bookTitle, // 실제 책 제목으로 변경
             QueryType: 'Title',
             MaxResults: 1,
             start: 1,
@@ -125,7 +130,6 @@ export default {
       }
     },
     getHighResolutionImage(url) {
-      // Replace 'coversum' with 'cover' in the URL to get a higher resolution image
       return url.replace('coversum', 'cover');
     }
   },

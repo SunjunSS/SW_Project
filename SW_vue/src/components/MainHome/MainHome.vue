@@ -7,6 +7,7 @@
       icon="mdi-arrow-up-bold-circle"
       color="brown-darken-1"
       size="x-large"
+      @click="goToPromptPage"
     ></v-icon>
   </div>
   <BookSlides />
@@ -25,7 +26,10 @@ export default {
   methods: {
     goToMapPage() {
       router.push('/map')
-    }
+    },
+    goToPromptPage() {
+      router.push('/prompt')
+    },
   }
 }
 </script>
