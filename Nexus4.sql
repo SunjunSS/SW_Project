@@ -1,5 +1,6 @@
--- 스키마 sw_project 생성 
-CREATE DATABASE sw_project;
+-- 스키마 sw_project 생성, 인코딩 
+CREATE DATABASE sw_project CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+
 -- sw_project 사용
 use sw_project;
 
