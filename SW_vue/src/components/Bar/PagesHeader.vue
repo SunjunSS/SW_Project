@@ -53,6 +53,10 @@ export default {
     },
     goToMainHome() {
       router.push('/');
+    },
+     // 로그인 페이지로 이동하는 메서드 
+    goToLoginPage() {
+      router.push('/login'); // /login 경로로 이동
     }
   }
 };
