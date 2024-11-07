@@ -8,7 +8,7 @@
       color="brown-darken-1"
       size="x-large"
       
-      @click="goToRealPromptPage"
+      @click="goToPromptPage"
     ></v-icon>
   </div>
   <BookSlides />

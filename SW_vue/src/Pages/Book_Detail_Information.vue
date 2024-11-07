@@ -68,7 +68,7 @@ export default {
       this.error = null;
       try {
         // 서버에서 책 제목을 가져옴
-        const titleResponse = await axios.get('http://localhost:3000/api/book-title');
+        const titleResponse = await axios.get('http://43.200.4.199/api/book-title');
         this.bookTitle = titleResponse.data.title; // 받아온 책 제목 저장
 
         const searchResponse = await axios.get('/api/ItemSearch.aspx', {
