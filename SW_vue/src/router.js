@@ -5,6 +5,7 @@ import BookDetail from './Pages/Book_Detail_Information.vue'
 import Prompt from './Pages/Prompt.vue'
 import Register from './Pages/Register.vue'
 import Login from './Pages/Login.vue' // Login.vue 경로 추가
+import RealPrompt from './Pages/RealPrompt.vue'
 
 const routes = [
   {
@@ -30,6 +31,10 @@ const routes = [
   {
     path: '/login', // 로그인 경로 추가
     component: Login // Login 컴포넌트 연결
+  },
+  {
+    path: "/realPrompt", // 실제 프롬프트 추가
+    component: RealPrompt // RealPrompt 컴포넌트 연결
   }
 ]
 

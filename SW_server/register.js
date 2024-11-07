@@ -4,7 +4,7 @@ const mysql = require("mysql2");
 const bodyParser = require("body-parser");
 const bcrypt = require("bcrypt");
 const app = express();
-const PORT = 3000;
+const PORT = 3003;
 const cors = require("cors"); // CORS 미들웨어 추가
 
 // CORS 허용
