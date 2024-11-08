@@ -43,7 +43,7 @@ export default {
   methods: {
     async login() {
       try {
-        const response = await axios.post('http://localhost:3001/api/login', {
+        const response = await axios.post('http://43.200.4.199/api/login', {
           email: this.email,
           password: this.password
         });
