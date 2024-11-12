@@ -1,34 +1,80 @@
 <template>
-  <v-container>
-    <v-form ref="form" v-model="valid" @submit.prevent="login">
-      <v-text-field
-        v-model="email"
-        :rules="[v => !!v || '이메일을 입력하세요.', v => /.+@.+\..+/.test(v) || '유효한 이메일을 입력하세요.']"
-        label="이메일"
-        required
-      ></v-text-field>
+  <v-container class="fill-height" fluid>
+    <v-row align="center" justify="center">
+      <v-col cols="12" sm="10" md="8" lg="6">
+        <v-card class="elevation-12 pa-8 custom-card" rounded="lg">
+          <div class="text-center mb-6">
+            <v-img
+              :src="headerImage2"
+              alt="Header Image"
+              height="45"
+              contain
+              class="mb-4"
+            ></v-img>
+            <h1 class="welcome-text">환영합니다!</h1>
+          </div>
 
-      <v-text-field
-        v-model="password"
-        :rules="[v => !!v || '비밀번호를 입력하세요.']"
-        label="비밀번호"
-        type="password"
-        required
-      ></v-text-field>
+          <v-form ref="form" v-model="valid" @submit="handleSubmit">
+            <v-text-field
+              v-model="email"
+              :rules="emailRules"
+              label="이메일"
+              prepend-icon="mdi-email"
+              required
+              outlined
+              dense
+            ></v-text-field>
 
-      <v-btn :disabled="!valid" color="primary" @click="login">로그인</v-btn>
-    </v-form>
+            <v-text-field
+              v-model="password"
+              :rules="passwordRules"
+              label="비밀번호"
+              prepend-icon="mdi-lock"
+              type="password"
+              required
+              outlined
+              dense
+            ></v-text-field>
 
-    <!-- 회원가입 페이지로 이동하는 버튼 -->
-    <v-btn text color="secondary" @click="goToRegister">회원가입</v-btn>
+            <div class="text-center">
+              <v-btn
+                :disabled="!valid"
+                color="primary"
+                type="submit"
+                x-large
+                class="mt-6 custom-btn"
+                elevation="2"
+                @click="login"
+              >
+                로그인
+              </v-btn>
+            </div>
+          </v-form>
 
-    <v-snackbar v-model="snackbar" :timeout="3000">{{ snackbarText }}</v-snackbar>
+          <div class="text-center mt-6">
+            <v-btn text color="secondary" class="custom-btn" @click="goToRegister">
+              회원가입
+            </v-btn>
+          </div>
+        </v-card>
+      </v-col>
+    </v-row>
+
+    <v-snackbar v-model="snackbar" :timeout="3000" color="info" rounded="pill">
+      <span class="snackbar-text">{{ snackbarText }}</span>
+      <template v-slot:action="{ attrs }">
+        <v-btn color="white" text v-bind="attrs" @click="snackbar = false">
+          닫기
+        </v-btn>
+      </template>
+    </v-snackbar>
   </v-container>
 </template>
 
 <script>
-import router from "../router.js"
-import axios from 'axios'; // axios 임포트
+import router from "../router.js";
+import axios from 'axios';
+import headerImage2 from '@/assets/headerImage2.png';
 
 export default {
   data() {
@@ -38,9 +84,21 @@ export default {
       valid: false,
       snackbar: false,
       snackbarText: '',
+      headerImage2: headerImage2,
+      emailRules: [
+        v => !!v || '이메일을 입력하세요.',
+        v => /.+@.+\..+/.test(v) || '유효한 이메일을 입력하세요.'
+      ],
+      passwordRules: [
+        v => !!v || '비밀번호를 입력하세요.'
+      ]
     };
   },
   methods: {
+    handleSubmit(e) {
+      e.preventDefault();
+      this.login();
+    },
     async login() {
       try {
         const response = await axios.post('http://43.200.4.199/api/login', {
@@ -51,7 +109,11 @@ export default {
         if (response.data.message === "로그인 성공!") {
           this.snackbarText = "로그인 성공!";
           this.snackbar = true;
-          router.push('/'); // 메인 페이지로 이동
+          
+          // snackbar가 0.7초 동안 보여지도록 설정
+          setTimeout(() => {
+            router.push('/');
+          }, 700); // 0.7초 후 홈으로 이동
         } else {
           this.snackbarText = response.data.message;
           this.snackbar = true;
@@ -62,7 +124,6 @@ export default {
       }
     },
     goToRegister() {
-      // 회원가입 페이지로 이동
       router.push('/register');
     }
   }
@@ -70,5 +131,41 @@ export default {
 </script>
 
 <style scoped>
-/* 스타일은 자유롭게 수정하세요 */
+.v-card {
+  background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+}
+
+.custom-card {
+  max-width: 600px;
+  width: 100%;
+  margin: 0 auto;
+}
+
+.custom-btn {
+  min-width: 200px !important;
+  width: auto !important;
+}
+
+.welcome-text{
+  color: #FF8C42;
+  text-shadow: 1px 1px 2px rgba(0,0,0,0.1);
+}
+
+.v-btn {
+  text-transform: none;
+  font-weight: bold;
+}
+
+.v-text-field :deep(.v-input__slot) {
+  background-color: rgba(255, 255, 255, 0.8) !important;
+}
+
+/* 스낵바 텍스트 중앙 정렬 */
+.snackbar-text {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  text-align: center;
+}
 </style>
