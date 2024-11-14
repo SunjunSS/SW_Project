@@ -1,12 +1,20 @@
 import { createRouter, createWebHistory } from 'vue-router'
+<<<<<<< HEAD
 import MainHome from './components/MainHome/MainHome.vue'
+=======
+import MainHome from './Pages/MainHome.vue'
+>>>>>>> kmkang
 import Map from './Pages/Map.vue'
 import BookDetail from './Pages/Book_Detail_Information.vue'
 import Prompt from './Pages/Prompt.vue'
 import Register from './Pages/Register.vue'
 import Login from './Pages/Login.vue' // Login.vue 경로 추가
 import RealPrompt from './Pages/RealPrompt.vue'
+<<<<<<< HEAD
 
+=======
+import Chatbot from './Pages/Chatbot.vue'
+>>>>>>> kmkang
 const routes = [
   {
     path: '/',
@@ -33,8 +41,17 @@ const routes = [
     component: Login // Login 컴포넌트 연결
   },
   {
+<<<<<<< HEAD
     path: "/realPrompt", // 실제 프롬프트 추가
     component: RealPrompt // RealPrompt 컴포넌트 연결
+=======
+    path: '/realPrompt', // 실제 프롬프트 추가
+    component: RealPrompt // RealPrompt 컴포넌트 연결
+  },
+  {
+    path: '/chatbot',
+    component: Chatbot
+>>>>>>> kmkang
   }
 ]
 

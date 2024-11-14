@@ -12,16 +12,19 @@
     ></v-icon>
   </div>
   <BookSlides />
+  <PagesFooter />
 </template>
 
 <script>
-import router from '../../router.js'
+import router from '../router.js'
 import PagesHeader from '@/components/Bar/PagesHeader.vue'
+import PagesFooter from '@/components/Bar/PagesFooter.vue'
 import BookSlides from '@/components/Book/BookSlides.vue'
 
 export default {
   components: {
     PagesHeader, // Register the PagesHeader component
+    PagesFooter,
     BookSlides
   },
   methods: {
