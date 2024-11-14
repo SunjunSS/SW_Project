@@ -26,7 +26,7 @@ export default {
       try {
         this.bookTitle = title; // 클릭된 책의 제목으로 업데이트
         // 책 제목을 서버로 전송
-        await axios.post('http://localhost:3000/api/book-title', {
+        await axios.post('http://43.200.4.199:80/api/book-title', {  // 서버 주소를 43.200.4.199로 변경
           title: this.bookTitle
         });
         // 전송 성공 후 Book_Detail_Information 페이지로 이동
