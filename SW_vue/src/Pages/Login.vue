@@ -132,7 +132,7 @@ export default {
 
 <style scoped>
 .v-card {
-  background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+  background: linear-gradient(135deg, #fffdfd 0%, #f7f2f2 100%);
 }
 
 .custom-card {
