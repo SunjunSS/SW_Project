@@ -3,9 +3,9 @@
     <span class="introduce">Developers</span>
     <div class="names">
       <span class="name">Kang Kyungmin</span>
-      <span class="name">Kim Seonjun</span>
+      <span class="name">Kim Sunjun</span>
+      <span class="name">Moon Kiup</span>
       <span class="name">Lee Heechan</span>
-      <span class="name">Mun Giup</span>
     </div>
   </div>
 </template>

@@ -9,6 +9,7 @@
 
 <script>
 import defaultProfileImage from '@/assets/headerImage.png' // 이미지 파일을 import
+import '@/styles/OpenAIMessage.css'
 
 export default {
   props: {
@@ -23,19 +24,3 @@ export default {
   }
 }
 </script>
-
-<style scoped>
-.ai-message {
-  align-self: flex-start; /* 왼쪽 정렬 */
-  background-color: #f1f1f1;
-  margin: 5px;
-  padding: 10px;
-  border-radius: 15px;
-  margin-bottom: 20px;
-}
-
-.profile-image {
-  width: 30px;
-  height: 30px;
-}
-</style>

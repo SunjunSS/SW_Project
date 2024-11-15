@@ -9,7 +9,7 @@
 
 <script>
 import defaultProfileImage from '@/assets/user.svg' // 이미지 파일을 import
-
+import '@/styles/UserMessage.css'
 export default {
   props: {
     message: {
@@ -23,19 +23,3 @@ export default {
   }
 }
 </script>
-
-<style scoped>
-.user-message {
-  align-self: flex-end; /* 오른쪽 정렬 */
-  background-color: #d1e7dd;
-  margin: 5px;
-  padding: 10px;
-  border-radius: 15px;
-  margin-bottom: 20px;
-}
-
-.profile-image {
-  width: 30px;
-  height: 30px;
-}
-</style>

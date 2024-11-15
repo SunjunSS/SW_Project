@@ -4,13 +4,7 @@
     <h3 style="color: gray">Top 30</h3>
   </div>
   <v-sheet class="mx-auto" elevation="8">
-    <v-slide-group
-      v-model="model"
-      class="pa-4"
-      selected-class="bg-success"
-      center-active="true"
-      show-arrows
-    >
+    <v-slide-group v-model="model" class="pa-4" center-active="true" show-arrows>
       <v-slide-group-item v-for="book in bestsellers" :key="book.isbn13" v-slot="{ selectedClass }">
         <v-card
           v-if="book.cover"
@@ -86,16 +80,17 @@ export default {
 <style>
 .v-sheet {
   width: 70%;
-  height: 22rem;
+  height: 352px;
   margin-top: 0.5rem;
+  margin-bottom: 2rem;
 }
 
 .v-slide-group {
-  height: 100%;
+  height: 352px;
 }
 
 .v-slide-group-item {
-  height: 90%;
+  height: 316px;
 }
 
 .v-card {

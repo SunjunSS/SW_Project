@@ -1,6 +1,6 @@
 <template>
   <PagesHeader />
-  <div class="chat-container">
+  <div class="chat-container" ref="chatContainer">
     <div v-for="(message, index) in messages" :key="index">
       <UserMessage v-if="message.isUser" :message="message" />
       <OpenAIMessage v-if="!message.isUser" :message="message" />
@@ -30,6 +30,9 @@ import PagesHeader from '../components/Bar/PagesHeader.vue'
 import axios from 'axios' // axios 임포트
 import UserMessage from '../components/Chat/UserMessage.vue'
 import OpenAIMessage from '../components/Chat/OpenAIMessage.vue'
+import '@/styles/Chatbot.css'
+import '@/styles/UserMessage.css'
+import '@/styles/OpenAIMessage.css'
 
 export default {
   data() {
@@ -43,25 +46,52 @@ export default {
     UserMessage,
     OpenAIMessage
   },
+  watch: {
+    messages: {
+      handler() {
+        this.$nextTick(() => {
+          this.scrollToBottom()
+        })
+      },
+      deep: true
+    }
+  },
   methods: {
+    scrollToBottom() {
+      const container = this.$refs.chatContainer
+      container.scrollTop = container.scrollHeight
+    },
     async sendMessage() {
       if (this.userInput.trim()) {
-        // 사용자 메시지를 messages 배열에 추가
         const userMessage = { text: this.userInput, isUser: true }
         this.messages.push(userMessage)
 
         try {
-          const response = await axios.post('http://localhost:3004/api/question', {
-            question: this.userInput
-          })
-          // AI 응답을 messages 배열에 추가
-          const aiMessage = { text: response.data.answer, isUser: false }
-          this.messages.push(aiMessage) // 서버 응답을 AI 메시지로 추가
+          const response = await axios.post(
+            'http://43.200.4.199/api/question',
+            { question: this.userInput },
+            {
+              headers: {
+                'Content-Type': 'application/json'
+              }
+              // withCredentials 옵션 제거
+            }
+          )
+
+          if (response.data && response.data.answer) {
+            const aiMessage = { text: response.data.answer, isUser: false }
+            this.messages.push(aiMessage)
+          }
         } catch (error) {
           console.error('서버 전송 오류:', error)
+          const errorMessage = {
+            text: '서버와의 통신 중 오류가 발생했습니다.',
+            isUser: false
+          }
+          this.messages.push(errorMessage)
         }
 
-        this.userInput = '' // 입력 필드 초기화
+        this.userInput = ''
       }
     },
     adjustHeight(event) {
@@ -74,65 +104,3 @@ export default {
   }
 }
 </script>
-
-<style scoped>
-.chat-container {
-  display: flex;
-  flex-direction: column;
-  width: 100%;
-  padding: 30px 170px 30px 150px;
-  overflow-y: auto;
-  max-height: calc(100vh - 200px);
-  position: relative; /* 부모 요소에 상대 위치 설정 */
-}
-
-/* 화면 크기가 768px 이하일 때 padding 값을 줄임 */
-@media (max-width: 768px) {
-  .chat-container {
-    padding: 30px 60px 30px 50px;
-  }
-}
-
-@media (max-width: 1000px) {
-  .chat-container {
-    padding: 30px 120px 30px 100px;
-  }
-}
-
-.prompt-container {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  position: absolute;
-  margin-top: 30px;
-  bottom: 0;
-  left: 50%;
-  transform: translateX(-50%);
-}
-
-#input-box {
-  display: flex;
-  position: absolute; /* 절대 위치 설정 */
-  bottom: 0; /* 하단에 위치 */
-  left: 0; /* 왼쪽 정렬 */
-  right: 0; /* 오른쪽 정렬 */
-  margin-top: 2rem;
-  margin-bottom: 2rem;
-  border: 2px #cfcfcf solid;
-  border-radius: 15px;
-  padding: 0.75rem 1rem;
-  width: 100%;
-  height: 50px; /* 기본 높이 설정 (1줄) */
-  max-height: 200px;
-  resize: none; /* 사용자가 크기를 조정하지 못하도록 설정 */
-  overflow-y: auto; /* 스크롤 허용 */
-  box-sizing: border-box; /* 패딩과 테두리를 포함한 크기 계산 */
-  transition: height 0.2s ease; /* 높이 변화에 애니메이션 추가 */
-}
-
-#search-btn {
-  position: absolute;
-  right: 10px;
-  top: 73px;
-}
-</style>
