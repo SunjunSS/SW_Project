@@ -101,6 +101,7 @@ export default {
     },
     async login() {
       try {
+        // 로그인 요청
         const response = await axios.post('http://43.200.4.199/api/login', {
           email: this.email,
           password: this.password
@@ -110,10 +111,12 @@ export default {
           this.snackbarText = "로그인 성공!";
           this.snackbar = true;
           
-          // snackbar가 0.7초 동안 보여지도록 설정
+          // 상태 업데이트 요청은 더 이상 필요하지 않음 (서버에서 자동으로 처리)
+          
+          // 0.7초 후 홈으로 이동
           setTimeout(() => {
             router.push('/');
-          }, 700); // 0.7초 후 홈으로 이동
+          }, 700);
         } else {
           this.snackbarText = response.data.message;
           this.snackbar = true;
@@ -160,7 +163,6 @@ export default {
   background-color: rgba(255, 255, 255, 0.8) !important;
 }
 
-/* 스낵바 텍스트 중앙 정렬 */
 .snackbar-text {
   display: flex;
   justify-content: center;
