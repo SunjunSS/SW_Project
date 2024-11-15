@@ -46,22 +46,35 @@ export default {
   methods: {
     async sendMessage() {
       if (this.userInput.trim()) {
-        // 사용자 메시지를 messages 배열에 추가
         const userMessage = { text: this.userInput, isUser: true }
         this.messages.push(userMessage)
 
         try {
-          const response = await axios.post('http://localhost:3004/api/question', {
-            question: this.userInput
-          })
-          // AI 응답을 messages 배열에 추가
-          const aiMessage = { text: response.data.answer, isUser: false }
-          this.messages.push(aiMessage) // 서버 응답을 AI 메시지로 추가
+          const response = await axios.post(
+            'http://43.200.4.199/api/question',
+            { question: this.userInput },
+            {
+              headers: {
+                'Content-Type': 'application/json'
+              }
+              // withCredentials 옵션 제거
+            }
+          )
+
+          if (response.data && response.data.answer) {
+            const aiMessage = { text: response.data.answer, isUser: false }
+            this.messages.push(aiMessage)
+          }
         } catch (error) {
           console.error('서버 전송 오류:', error)
+          const errorMessage = {
+            text: '서버와의 통신 중 오류가 발생했습니다.',
+            isUser: false
+          }
+          this.messages.push(errorMessage)
         }
 
-        this.userInput = '' // 입력 필드 초기화
+        this.userInput = ''
       }
     },
     adjustHeight(event) {
