@@ -1,0 +1,22 @@
+.user-message {
+    display: flex;
+    flex-direction: row-reverse;
+    align-items: center;
+    align-self: flex-end;
+    gap: 10px;
+    max-width: 100%;
+    margin-bottom: 20px;
+    margin-right: 20px;
+}
+
+.message-text {
+    background-color: #d1e7dd;
+    padding: 10px;
+    border-radius: 15px;
+    word-wrap: break-word;
+}
+
+.profile-image {
+    width: 30px;
+    height: 30px;
+}
