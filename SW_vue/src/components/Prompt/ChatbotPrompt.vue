@@ -69,6 +69,9 @@ export default {
     handleCompositionEnd() {
       this.isComposing = false // IME 입력 종료
     },
+    initHeight() {
+      this.$refs.textarea.style.height = '50px'
+    },
     sendInput() {
       if (this.isComposing) {
         // IME 입력 중이면 API 요청 방지
@@ -78,6 +81,7 @@ export default {
         this.$emit('send-message', this.inputValue.trim())
         this.inputValue = ''
         this.adjustHeight()
+        this.initHeight()
       }
     }
   }
@@ -121,7 +125,7 @@ export default {
 
 #send-btn {
   position: absolute;
-  bottom: 9px;
+  bottom: 16px;
   right: 12px;
 }
 </style>
