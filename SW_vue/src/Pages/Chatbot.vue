@@ -6,31 +6,15 @@
       <OpenAIMessage v-if="!message.isUser" :message="message" />
     </div>
   </div>
-  <div class="prompt-container">
-    <textarea
-      id="input-box"
-      type="text"
-      @input="adjustHeight"
-      v-model="userInput"
-      placeholder="메시지를 입력해주세요."
-      cols="50"
-    />
-    <v-icon
-      id="search-btn"
-      icon="mdi-arrow-up-bold-circle"
-      color="brown-darken-1"
-      size="x-large"
-      @click="sendMessage"
-    ></v-icon>
-  </div>
+  <ChatbotPrompt v-model="userInput" @click="sendMessage" @input="adjustHeight" />
 </template>
 
 <script>
 import PagesHeader from '../components/Bar/PagesHeader.vue'
-import axios from 'axios' // axios 임포트
+import axios from 'axios'
 import UserMessage from '../components/Chat/UserMessage.vue'
 import OpenAIMessage from '../components/Chat/OpenAIMessage.vue'
-import '@/styles/Chatbot.css'
+import ChatbotPrompt from '../components/Prompt/ChatbotPrompt.vue'
 import '@/styles/UserMessage.css'
 import '@/styles/OpenAIMessage.css'
 
@@ -38,13 +22,14 @@ export default {
   data() {
     return {
       userInput: '',
-      messages: [] // 모든 사용자와 AI 메시지를 저장할 배열
+      messages: []
     }
   },
   components: {
     PagesHeader,
     UserMessage,
-    OpenAIMessage
+    OpenAIMessage,
+    ChatbotPrompt
   },
   watch: {
     messages: {
@@ -58,23 +43,32 @@ export default {
   },
   methods: {
     scrollToBottom() {
-      const container = this.$refs.chatContainer
-      container.scrollTop = container.scrollHeight
+      this.$nextTick(() => {
+        const container = this.$refs.chatContainer
+        if (container) {
+          container.scrollTo({
+            top: container.scrollHeight,
+            behavior: 'smooth' // 부드러운 스크롤
+          })
+        }
+      })
     },
     async sendMessage() {
       if (this.userInput.trim()) {
         const userMessage = { text: this.userInput, isUser: true }
         this.messages.push(userMessage)
 
+        // textarea 내용 초기화
+        this.userInput = ''
+
         try {
           const response = await axios.post(
             'http://43.200.4.199/api/question',
-            { question: this.userInput },
+            { question: userMessage.text },
             {
               headers: {
                 'Content-Type': 'application/json'
               }
-              // withCredentials 옵션 제거
             }
           )
 
@@ -90,8 +84,6 @@ export default {
           }
           this.messages.push(errorMessage)
         }
-
-        this.userInput = ''
       }
     },
     adjustHeight(event) {
@@ -104,3 +96,25 @@ export default {
   }
 }
 </script>
+
+<style scoped>
+.chat-container {
+  padding: 50px 15% 30px 15%;
+  height: calc(100vh - 180px); /* ChatbotPrompt를 고려하여 높이 조정 */
+  overflow-y: auto;
+  box-sizing: border-box;
+}
+
+.chat-container::-webkit-scrollbar {
+  width: 8px;
+}
+
+.chat-container::-webkit-scrollbar-thumb {
+  background-color: #cfcfcf;
+  border-radius: 4px;
+}
+
+.chat-container::-webkit-scrollbar-track {
+  background-color: #f1f1f1;
+}
+</style>

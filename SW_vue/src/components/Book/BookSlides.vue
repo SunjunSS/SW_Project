@@ -1,5 +1,5 @@
 <template>
-  <div style="margin: 1rem 0 0 15%">
+  <div class="bestseller-header">
     <h1>이번 주 베스트셀러</h1>
     <h3 style="color: gray">Top 30</h3>
   </div>
@@ -78,6 +78,10 @@ export default {
 }
 </script>
 <style>
+.bestseller-header {
+  margin: 10px 0 0 15%;
+}
+
 .v-sheet {
   width: 70%;
   height: 352px;
