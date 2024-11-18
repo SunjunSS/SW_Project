@@ -1,6 +1,10 @@
 <template>
   <PagesHeader />
-  <PromptContainer placeholder="오늘은 어떤 책을 읽어볼까요?" @click="goToPromptPage" />
+  <PromptContainer
+    v-model="userInput"
+    placeholder="오늘은 어떤 책을 읽어볼까요?"
+    @submit="handleSubmit"
+  />
   <BookSlides />
   <PagesFooter />
 </template>
@@ -19,12 +23,17 @@ export default {
     PagesFooter,
     PromptContainer
   },
+  data() {
+    return {
+      userInput: ''
+    }
+  },
   methods: {
-    goToMapPage() {
-      router.push('/map')
-    },
-    goToPromptPage() {
-      router.push('/chatbot')
+    handleSubmit(message) {
+      router.push({
+        path: '/chatbot',
+        query: { initialMessage: message }
+      })
     }
   }
 }

@@ -1,23 +1,23 @@
 <template>
-  <div class="prompt-container">
-    <div class="input-wrapper">
+  <div class="prompt-container" ref="container">
+    <div class="input-wrapper" ref="inputWrapper">
       <textarea
-        id="input-box"
+        ref="textarea"
         class="input-box"
-        type="text"
         :placeholder="placeholder"
-        :value="modelValue"
-        @input="handleInput"
-        @keydown="handleKeydown"
-        cols="50"
+        v-model="inputValue"
+        @input="adjustHeight"
+        @keydown.enter.prevent="handleEnter"
+        @compositionstart="isComposing = true"
+        @compositionend="handleCompositionEnd"
         rows="1"
       ></textarea>
       <v-icon
-        id="search-btn"
+        id="send-btn"
         icon="mdi-arrow-up-bold-circle"
         color="brown-darken-1"
         size="x-large"
-        @click="handleClick"
+        @click="sendInput"
       ></v-icon>
     </div>
   </div>
@@ -35,34 +35,49 @@ export default {
       default: ''
     }
   },
-  emits: ['update:modelValue', 'click', 'keyup'],
+  emits: ['update:modelValue', 'send-message'],
+  data() {
+    return {
+      inputValue: this.modelValue,
+      isComposing: false // IME 입력 상태 여부
+    }
+  },
+  watch: {
+    modelValue(newValue) {
+      this.inputValue = newValue
+    }
+  },
   methods: {
-    handleInput(event) {
-      this.$emit('update:modelValue', event.target.value)
-
-      const textarea = event.target
-      const baseHeight = 50 // 기본 높이 (1줄)
-
-      // 임시로 높이를 auto로 설정하여 실제 내용 높이 계산
+    adjustHeight() {
+      const textarea = this.$refs.textarea
       textarea.style.height = 'auto'
-
-      // 줄 수 계산 (개행 문자 + 내용 길이에 따른 자동 줄바꿈)
-      const newLines = (textarea.value.match(/\n/g)?.length || 0) + 1
-      const contentLines = Math.ceil(textarea.scrollHeight / baseHeight)
-      const lines = Math.min(Math.max(newLines, contentLines), 3)
-
-      // 높이를 줄 수에 맞게 설정
-      textarea.style.height = `${baseHeight * lines}px`
+      const maxHeight = 150
+      textarea.style.height = `${Math.min(textarea.scrollHeight, maxHeight)}px`
     },
-    handleClick() {
-      this.$emit('click')
+    handleEnter(event) {
+      if (this.isComposing) {
+        // IME 입력 중이면 Enter를 무시
+        return
+      }
+      if (!event.shiftKey) {
+        this.sendInput()
+      } else {
+        this.inputValue += '\n'
+        this.adjustHeight()
+      }
     },
-    handleKeydown(event) {
-      if (event.key === 'Enter' && !event.shiftKey) {
-        event.preventDefault()
-        if (this.modelValue.trim()) {
-          this.$emit('click')
-        }
+    handleCompositionEnd() {
+      this.isComposing = false // IME 입력 종료
+    },
+    sendInput() {
+      if (this.isComposing) {
+        // IME 입력 중이면 API 요청 방지
+        return
+      }
+      if (this.inputValue.trim()) {
+        this.$emit('send-message', this.inputValue.trim())
+        this.inputValue = ''
+        this.adjustHeight()
       }
     }
   }
@@ -73,44 +88,40 @@ export default {
 .prompt-container {
   display: flex;
   justify-content: center;
+  position: fixed;
+  bottom: 0;
   width: 100%;
-  margin-top: 20px;
-  height: auto;
+  background-color: white;
+  padding: 20px 0;
 }
 
 .input-wrapper {
   position: relative;
   width: 70%;
-  min-height: 50px;
+  transition: height 0.1s ease-in-out;
 }
 
 .input-box {
-  position: absolute;
-  bottom: 0;
-  border: 2px #cfcfcf solid;
+  border: 2px solid #cfcfcf;
   border-radius: 25px;
   padding: 0.75rem 3rem 0.75rem 1rem;
   width: 100%;
-  height: 50px;
   min-height: 50px;
   max-height: 150px;
   resize: none;
-  overflow-y: auto;
+  overflow-y: hidden;
   box-sizing: border-box;
   line-height: 1.3;
-  transition: height 0.1s ease-in-out; /* 부드러운 높이 변화 애니메이션 */
-  word-wrap: break-word; /* 긴 단어 자동 줄바꿈 */
-  white-space: pre-wrap; /* 공백과 줄바꿈 유지 */
+  white-space: pre-wrap;
 }
 
 .input-box::-webkit-scrollbar {
   display: none;
 }
 
-#search-btn {
+#send-btn {
   position: absolute;
   bottom: 9px;
   right: 12px;
-  z-index: 1;
 }
 </style>

@@ -1,22 +1,24 @@
 <template>
   <div class="prompt-container">
-    <textarea
-      id="input-box"
-      class="input-box"
-      type="text"
-      :placeholder="placeholder"
-      :value="modelValue"
-      @input="handleInput"
-      @keyup="$emit('keyup', $event)"
-      cols="50"
-    ></textarea>
-    <v-icon
-      id="search-btn"
-      icon="mdi-arrow-up-bold-circle"
-      color="brown-darken-1"
-      size="x-large"
-      @click="$emit('click')"
-    ></v-icon>
+    <div class="input-wrapper">
+      <textarea
+        id="input-box"
+        class="input-box"
+        type="text"
+        :placeholder="placeholder"
+        :value="modelValue"
+        @input="handleInput"
+        @keydown.enter.prevent="handleKeydown"
+        cols="50"
+      ></textarea>
+      <v-icon
+        id="search-btn"
+        icon="mdi-arrow-up-bold-circle"
+        color="brown-darken-1"
+        size="x-large"
+        @click="handleClick"
+      ></v-icon>
+    </div>
   </div>
 </template>
 
@@ -32,10 +34,22 @@ export default {
       default: ''
     }
   },
-  emits: ['update:modelValue', 'click', 'keyup'],
+  emits: ['update:modelValue', 'click', 'keyup', 'submit'],
   methods: {
     handleInput(event) {
       this.$emit('update:modelValue', event.target.value)
+    },
+    handleClick() {
+      if (this.modelValue.trim()) {
+        this.$emit('submit', this.modelValue)
+      }
+    },
+    handleKeydown(event) {
+      if (!event.shiftKey) {
+        if (this.modelValue.trim()) {
+          this.$emit('submit', this.modelValue)
+        }
+      }
     }
   }
 }
@@ -48,22 +62,33 @@ export default {
   display: flex;
   align-items: center;
   justify-content: center;
-  padding-top: 20px;
-  padding-bottom: 20px;
+  padding: 20px 0;
 }
+
+.input-wrapper {
+  position: relative;
+  width: 70%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
 .input-box {
   border: 2px #cfcfcf solid;
   border-radius: 15px;
-  padding: 0.75rem 1rem;
-  width: 70%;
+  padding: 0.75rem 3rem 0.75rem 1rem;
+  width: 100%;
   height: 70%;
   resize: none;
-  z-index: 1;
 }
+
 #search-btn {
   position: absolute;
-  bottom: 75.9%;
-  right: 15.3%;
+  bottom: 12px;
+  right: 10px;
+  transform: translateY(-50%);
   z-index: 2;
+  cursor: pointer;
 }
 </style>
