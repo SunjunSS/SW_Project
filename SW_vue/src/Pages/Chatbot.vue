@@ -6,52 +6,39 @@
       <OpenAIMessage v-if="!message.isUser" :message="message" />
     </div>
   </div>
-  <div class="prompt-container">
-    <textarea
-      id="input-box"
-      type="text"
-      @input="adjustHeight"
-      v-model="userInput"
-      placeholder="메시지를 입력해주세요."
-      cols="50"
-    />
-    <v-icon
-      id="search-btn"
-      icon="mdi-arrow-up-bold-circle"
-      color="brown-darken-1"
-      size="x-large"
-      @click="sendMessage"
-    ></v-icon>
-  </div>
+  <ChatbotPrompt v-model="userInput" @send-message="sendMessage" />
 </template>
 
 <script>
 import PagesHeader from '../components/Bar/PagesHeader.vue'
-import axios from 'axios' // axios 임포트
+import axios from 'axios'
 import UserMessage from '../components/Chat/UserMessage.vue'
 import OpenAIMessage from '../components/Chat/OpenAIMessage.vue'
-import '@/styles/Chatbot.css'
-import '@/styles/UserMessage.css'
-import '@/styles/OpenAIMessage.css'
+import ChatbotPrompt from '../components/Prompt/ChatbotPrompt.vue'
 
 export default {
-  data() {
-    return {
-      userInput: '',
-      messages: [] // 모든 사용자와 AI 메시지를 저장할 배열
-    }
-  },
   components: {
     PagesHeader,
     UserMessage,
-    OpenAIMessage
+    OpenAIMessage,
+    ChatbotPrompt
+  },
+  data() {
+    return {
+      userInput: '',
+      messages: []
+    }
+  },
+  async created() {
+    const initialMessage = this.$route.query.initialMessage
+    if (initialMessage) {
+      this.sendMessage(initialMessage)
+    }
   },
   watch: {
     messages: {
       handler() {
-        this.$nextTick(() => {
-          this.scrollToBottom()
-        })
+        this.$nextTick(() => this.scrollToBottom())
       },
       deep: true
     }
@@ -59,48 +46,62 @@ export default {
   methods: {
     scrollToBottom() {
       const container = this.$refs.chatContainer
-      container.scrollTop = container.scrollHeight
-    },
-    async sendMessage() {
-      if (this.userInput.trim()) {
-        const userMessage = { text: this.userInput, isUser: true }
-        this.messages.push(userMessage)
-
-        try {
-          const response = await axios.post(
-            'http://43.200.4.199/api/question',
-            { question: this.userInput },
-            {
-              headers: {
-                'Content-Type': 'application/json'
-              }
-              // withCredentials 옵션 제거
-            }
-          )
-
-          if (response.data && response.data.answer) {
-            const aiMessage = { text: response.data.answer, isUser: false }
-            this.messages.push(aiMessage)
-          }
-        } catch (error) {
-          console.error('서버 전송 오류:', error)
-          const errorMessage = {
-            text: '서버와의 통신 중 오류가 발생했습니다.',
-            isUser: false
-          }
-          this.messages.push(errorMessage)
-        }
-
-        this.userInput = ''
+      if (container) {
+        container.scrollTo({
+          top: container.scrollHeight,
+          behavior: 'smooth'
+        })
       }
     },
-    adjustHeight(event) {
-      const textarea = event.target
-      textarea.style.height = 'auto' // 높이를 초기화
-      const lineHeight = 50 // 각 줄의 높이 (50px)
-      const lines = Math.min(Math.floor(textarea.scrollHeight / lineHeight), 6) // 줄 수 계산 (최대 6줄)
-      textarea.style.height = `${lines * lineHeight}px` // 높이 조정
+    async sendMessage(message = this.userInput.trim()) {
+      if (!message) return
+
+      // 사용자 메시지 추가
+      this.messages.push({ text: message, isUser: true })
+
+      // 입력창 초기화
+      this.userInput = ''
+
+      try {
+        const response = await axios.post(
+          'http://43.200.4.199/api/question',
+          { question: message },
+          { headers: { 'Content-Type': 'application/json' } }
+        )
+
+        if (response.data && response.data.answer) {
+          this.messages.push({ text: response.data.answer, isUser: false })
+        }
+      } catch (error) {
+        console.error('서버 오류:', error)
+        this.messages.push({
+          text: '서버와의 통신 중 오류가 발생했습니다.',
+          isUser: false
+        })
+      }
     }
   }
 }
 </script>
+
+<style scoped>
+.chat-container {
+  padding: 50px 15% 30px 15%;
+  height: calc(100vh - 180px);
+  overflow-y: auto;
+  box-sizing: border-box;
+}
+
+.chat-container::-webkit-scrollbar {
+  width: 8px;
+}
+
+.chat-container::-webkit-scrollbar-thumb {
+  background-color: #cfcfcf;
+  border-radius: 4px;
+}
+
+.chat-container::-webkit-scrollbar-track {
+  background-color: #f1f1f1;
+}
+</style>
