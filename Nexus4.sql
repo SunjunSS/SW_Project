@@ -21,6 +21,7 @@ CREATE TABLE books (
     book_id INT AUTO_INCREMENT PRIMARY KEY,
     user_id INT,
     title VARCHAR(255) NOT NULL,
+    author VARCHAR(255) NOT NULL,
     ISBN VARCHAR(100) UNIQUE NOT NULL,
     price_standard DECIMAL(10,2) NOT NULL,
     pricesales DECIMAL(10,2) NOT NULL,
