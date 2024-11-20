@@ -69,9 +69,13 @@ export default {
           { headers: { 'Content-Type': 'application/json' } }
         )
 
-        if (response.data && response.data.answer) {
-          this.messages.push({ text: response.data.answer, isUser: false })
-        }
+        // if (response.data && response.data.answer) {
+        //   this.messages.push({ text: response.data.answer, isUser: false })
+        // }
+
+        const answer = response.data // response.data가 전체 텍스트를 포함
+
+        this.messages.push({ text: answer, isUser: false })
       } catch (error) {
         console.error('서버 오류:', error)
         this.messages.push({
