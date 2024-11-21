@@ -4,13 +4,7 @@
       <v-col cols="12" sm="10" md="8" lg="6">
         <v-card class="elevation-12 pa-8 custom-card" rounded="lg">
           <div class="text-center mb-6">
-            <v-img
-              :src="headerImage2"
-              alt="Header Image"
-              height="45"
-              contain
-              class="mb-4"
-            ></v-img>
+            <v-img :src="headerImage2" alt="Header Image" height="45" contain class="mb-4"></v-img>
             <h1 class="welcome-text">환영합니다!</h1>
           </div>
 
@@ -63,18 +57,16 @@
     <v-snackbar v-model="snackbar" :timeout="3000" color="info" rounded="pill">
       <span class="snackbar-text">{{ snackbarText }}</span>
       <template v-slot:action="{ attrs }">
-        <v-btn color="white" text v-bind="attrs" @click="snackbar = false">
-          닫기
-        </v-btn>
+        <v-btn color="white" text v-bind="attrs" @click="snackbar = false"> 닫기 </v-btn>
       </template>
     </v-snackbar>
   </v-container>
 </template>
 
 <script>
-import router from "../router.js";
-import axios from 'axios';
-import headerImage2 from '@/assets/headerImage2.png';
+import router from '../router.js'
+import axios from 'axios'
+import headerImage2 from '@/assets/headerImage2.png'
 
 export default {
   data() {
@@ -86,18 +78,20 @@ export default {
       snackbarText: '',
       headerImage2: headerImage2,
       emailRules: [
-        v => !!v || '이메일을 입력하세요.',
-        v => /.+@.+\..+/.test(v) || '유효한 이메일을 입력하세요.'
+        (v) => !!v || '이메일을 입력하세요.',
+        (v) => /.+@.+\..+/.test(v) || '유효한 이메일을 입력하세요.'
       ],
-      passwordRules: [
-        v => !!v || '비밀번호를 입력하세요.'
-      ]
-    };
+      passwordRules: [(v) => !!v || '비밀번호를 입력하세요.']
+    }
+  },
+  created() {
+    // 로컬 스토리지 초기화
+    localStorage.removeItem('chatMessages')
   },
   methods: {
     handleSubmit(e) {
-      e.preventDefault();
-      this.login();
+      e.preventDefault()
+      this.login()
     },
     async login() {
       try {
@@ -105,32 +99,32 @@ export default {
         const response = await axios.post('http://43.200.4.199/api/login', {
           email: this.email,
           password: this.password
-        });
+        })
 
-        if (response.data.message === "로그인 성공!") {
-          this.snackbarText = "로그인 성공!";
-          this.snackbar = true;
-          
+        if (response.data.message === '로그인 성공!') {
+          this.snackbarText = '로그인 성공!'
+          this.snackbar = true
+
           // 상태 업데이트 요청은 더 이상 필요하지 않음 (서버에서 자동으로 처리)
-          
+
           // 0.7초 후 홈으로 이동
           setTimeout(() => {
-            router.push('/');
-          }, 700);
+            router.push('/')
+          }, 700)
         } else {
-          this.snackbarText = response.data.message;
-          this.snackbar = true;
+          this.snackbarText = response.data.message
+          this.snackbar = true
         }
       } catch (error) {
-        this.snackbarText = error.response?.data.message || '로그인 실패';
-        this.snackbar = true;
+        this.snackbarText = error.response?.data.message || '로그인 실패'
+        this.snackbar = true
       }
     },
     goToRegister() {
-      router.push('/register');
+      router.push('/register')
     }
   }
-};
+}
 </script>
 
 <style scoped>
@@ -149,9 +143,9 @@ export default {
   width: auto !important;
 }
 
-.welcome-text{
-  color: #FF8C42;
-  text-shadow: 1px 1px 2px rgba(0,0,0,0.1);
+.welcome-text {
+  color: #ff8c42;
+  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.1);
 }
 
 .v-btn {
