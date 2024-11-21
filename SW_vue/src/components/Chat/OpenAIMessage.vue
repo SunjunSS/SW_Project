@@ -2,17 +2,17 @@
   <div class="ai-message">
     <img class="profile-image" :src="profileImage" alt="AI" />
     <div class="message-text">
-      <span v-for="(part, index) in parsedMessage" :key="index">
+      <div v-for="(part, index) in parsedMessage" :key="index">
         <a
           v-if="part.isBookTitle"
           href="#"
           class="book-title"
-          @click.prevent="sendMessage(part.text)"
+          @click.prevent="sendMessage(part.title, part.author)"
         >
           {{ part.text }}
         </a>
         <span v-else>{{ part.text }}</span>
-      </span>
+      </div>
     </div>
   </div>
 </template>
@@ -40,8 +40,8 @@ export default {
       const parts = []
       let currentIndex = 0
 
-      // <<책제목>> 패턴을 찾아서 분리
-      const regex = /<<([^>]+)>>/g
+      // <<책제목>> (원제) - 작가 패턴을 찾아서 분리
+      const regex = /<<([^>]+)>>\s*(?:\([^)]+\))?\s*-\s*([^\n]+)/g
       let match
 
       while ((match = regex.exec(text)) !== null) {
@@ -53,9 +53,14 @@ export default {
           })
         }
 
-        // 책 제목 추가
+        const title = match[1].trim()
+        const author = match[2].trim()
+
+        // 책 제목과 작가 정보 추가
         parts.push({
-          text: match[1], // << >> 기호를 제외한 실제 책 제목
+          text: `${title} - ${author}`,
+          title: title,
+          author: author,
           isBookTitle: true
         })
 
@@ -74,10 +79,11 @@ export default {
     }
   },
   methods: {
-    async sendMessage(bookTitle) {
+    async sendMessage(title, author) {
       try {
         await axios.post('http://43.200.4.199:80/api/book-title', {
-          title: bookTitle
+          title: title,
+          author: author
         })
         router.push('/bookdetail')
       } catch (error) {
