@@ -3,17 +3,15 @@
     <img class="profile-image" :src="profileImage" alt="AI" />
     <div class="message-text">
       <span v-for="(part, index) in parsedMessage" :key="index">
-        <p>
-          <a
-            v-if="part.isBookTitle"
-            href="#"
-            class="book-title"
-            @click.prevent="sendMessage(part.text)"
-          >
-            {{ part.text }}
-          </a>
-          <span v-else>{{ part.text }}</span>
-        </p>
+        <a
+          v-if="part.isBookTitle"
+          href="#"
+          class="book-title"
+          @click.prevent="sendMessage(part.text)"
+        >
+          {{ part.text }}
+        </a>
+        <span v-else>{{ part.text }}</span>
       </span>
     </div>
   </div>
