@@ -10,6 +10,7 @@
 </template>
 
 <script>
+import { nextTick } from 'vue'
 import PagesHeader from '../components/Bar/PagesHeader.vue'
 import axios from 'axios'
 import UserMessage from '../components/Chat/UserMessage.vue'
@@ -43,6 +44,9 @@ export default {
     messages: {
       handler(newMessages) {
         localStorage.setItem('chatMessages', JSON.stringify(newMessages))
+        nextTick(() => {
+          this.scrollToBottom()
+        })
       },
       deep: true
     }
@@ -76,6 +80,7 @@ export default {
           { question: message },
           { headers: { 'Content-Type': 'application/json' } }
         )
+
         if (response.data && response.data.answer) {
           this.messages.push({ text: response.data.answer, isUser: false })
         }
@@ -87,6 +92,11 @@ export default {
         })
       }
     }
+  },
+  mounted() {
+    nextTick(() => {
+      this.scrollToBottom()
+    })
   }
 }
 </script>

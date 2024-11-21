@@ -84,10 +84,16 @@ export default {
         }
 
         if (match[4]) {
+          // 첫 번째 push: 텍스트 추가
+          parts.push({
+            text: match[1],
+            isBookTitle: false,
+            isNewline: true
+          })
           parts.push({
             text: match[4],
             isBookTitle: false,
-            isNewline: parts.length > 0 && !parts[parts.length - 1].isNewline
+            isNewline: false
           })
         }
 
@@ -98,7 +104,7 @@ export default {
         parts.push({
           text: text.substring(currentIndex),
           isBookTitle: false,
-          isNewline: false
+          isNewline: true
         })
       }
 
