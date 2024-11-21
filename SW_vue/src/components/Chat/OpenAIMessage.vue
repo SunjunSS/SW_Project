@@ -83,19 +83,19 @@ export default {
           })
         }
 
-      if (match[4]) {
-        // 첫 번째 push: 텍스트 추가
-        parts.push({
-          text: match[1],
-          isBookTitle: false,
-          isNewline: true 
-        });
-        parts.push({
-          text: match[4],
-          isBookTitle: false,
-          isNewline: false 
-        });
-      }
+        if (match[4]) {
+          // 첫 번째 push: 텍스트 추가
+          parts.push({
+            text: match[1],
+            isBookTitle: false,
+            isNewline: true
+          })
+          parts.push({
+            text: match[4],
+            isBookTitle: false,
+            isNewline: false
+          })
+        }
 
         currentIndex = match.index + match[0].length
       }

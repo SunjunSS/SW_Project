@@ -85,7 +85,7 @@ export default {
 
 #search-btn {
   position: absolute;
-  bottom: 12px;
+  bottom: 24px;
   right: 10px;
   transform: translateY(-50%);
   z-index: 2;

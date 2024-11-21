@@ -6,7 +6,7 @@
     @submit="handleSubmit"
   />
   <BookSlides />
-  <RecommendedBookSlides/>
+  <RecommendedBookSlides />
   <PagesFooter />
 </template>
 
@@ -25,6 +25,10 @@ export default {
     PagesFooter,
     PromptContainer,
     RecommendedBookSlides
+  },
+  created() {
+    // 로컬 스토리지 초기화
+    localStorage.removeItem('chatMessages')
   },
   data() {
     return {
