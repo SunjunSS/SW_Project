@@ -2,17 +2,24 @@
   <div class="ai-message">
     <img class="profile-image" :src="profileImage" alt="AI" />
     <div class="message-text">
-      <div v-for="(part, index) in parsedMessage" :key="index">
+      <template v-for="(part, index) in parsedMessage" :key="index">
+        <br v-if="part.isNewline" />
         <a
           v-if="part.isBookTitle"
           href="#"
           class="book-title"
           @click.prevent="sendMessage(part.title, part.author)"
         >
-          {{ part.text }}
+          {{ part.title }}
         </a>
+        <span v-if="part.isBookTitle && part.originalTitle">
+          {{ ` (${part.originalTitle}) - ${part.author}` }}
+        </span>
+        <span v-else-if="part.isBookTitle && part.originalTitle === null">
+          {{ ` - ${part.author}` }}
+        </span>
         <span v-else>{{ part.text }}</span>
-      </div>
+      </template>
     </div>
   </div>
 </template>
@@ -38,40 +45,60 @@ export default {
     parsedMessage() {
       const text = this.message.text
       const parts = []
-      let currentIndex = 0
 
-      // <<책제목>> (원제) - 작가 패턴을 찾아서 분리
-      const regex = /<<([^>]+)>>\s*(?:\([^)]+\))?\s*-\s*([^\n]+)/g
+      const regex = /<<([^>]+)>>(?:\s*\(([^)]+)\))?\s*-\s*([^\n]+)|\n\n|(\d+\.)/g
+      let currentIndex = 0
       let match
 
       while ((match = regex.exec(text)) !== null) {
-        // 책 제목 앞의 일반 텍스트 추가
         if (match.index > currentIndex) {
           parts.push({
             text: text.substring(currentIndex, match.index),
-            isBookTitle: false
+            isBookTitle: false,
+            isNewline: false
           })
         }
 
-        const title = match[1].trim()
-        const author = match[2].trim()
+        if (match[1]) {
+          const title = match[1].trim()
+          const originalTitle = match[2] ? match[2].trim() : null
+          const author = match[3].trim()
 
-        // 책 제목과 작가 정보 추가
-        parts.push({
-          text: `${title} - ${author}`,
-          title: title,
-          author: author,
-          isBookTitle: true
-        })
+          console.log(`title: ${title}, originalTitle: ${originalTitle}`)
+
+          parts.push({
+            text: match[0],
+            title: title,
+            originalTitle: title === originalTitle ? null : originalTitle,
+            author: author,
+            isBookTitle: true,
+            isNewline: false
+          })
+        }
+        if (match[0] === '\n\n') {
+          parts.push({
+            text: '',
+            isBookTitle: false,
+            isNewline: true
+          })
+        }
+
+        if (match[4]) {
+          parts.push({
+            text: match[4],
+            isBookTitle: false,
+            isNewline: parts.length > 0 && !parts[parts.length - 1].isNewline
+          })
+        }
 
         currentIndex = match.index + match[0].length
       }
 
-      // 마지막 남은 텍스트 추가
       if (currentIndex < text.length) {
         parts.push({
           text: text.substring(currentIndex),
-          isBookTitle: false
+          isBookTitle: false,
+          isNewline: false
         })
       }
 

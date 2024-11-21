@@ -2,14 +2,23 @@
   <div class="footer">
     <span class="introduce">Developers</span>
     <div class="names">
-      <span class="name">Kang Kyungmin</span>
-      <span class="name">Kim Sunjun</span>
-      <span class="name">Moon Kiup</span>
-      <span class="name">Lee Heechan</span>
+      <span class="name" @click="goToGithub('KMKang01')">Kang Kyungmin</span>
+      <span class="name" @click="goToGithub('SunjunSS')">Kim Sunjun</span>
+      <span class="name" @click="goToGithub('kiup830')">Moon Kiup</span>
+      <span class="name" @click="goToGithub('chan5337')">Lee Heechan</span>
     </div>
   </div>
 </template>
 
+<script>
+export default {
+  methods: {
+    goToGithub(name) {
+      window.open(`https://github.com/${name}`, '_blank')
+    }
+  }
+}
+</script>
 <style>
 .footer {
   display: flex;
@@ -19,6 +28,7 @@
   border-top: 1px solid gray;
   color: gray;
   font-weight: bolder;
+  font-size: 1.2rem;
   align-items: center;
   justify-content: space-between;
   padding: 0 20px 0 20px;
