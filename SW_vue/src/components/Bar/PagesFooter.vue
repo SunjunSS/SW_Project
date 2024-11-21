@@ -24,7 +24,7 @@ export default {
   display: flex;
   width: 90%;
   height: 80px;
-  margin: 60px auto 0;
+  margin: 0 auto;
   border-top: 1px solid gray;
   color: gray;
   font-weight: bolder;
@@ -32,7 +32,7 @@ export default {
   align-items: center;
   justify-content: space-between;
   padding: 0 20px 0 20px;
-  margin-top: 150px;
+  margin-top: 60px;
 }
 
 .introduce {
