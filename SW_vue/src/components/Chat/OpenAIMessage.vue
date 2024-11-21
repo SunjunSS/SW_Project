@@ -4,14 +4,20 @@
     <div class="message-text">
       <template v-for="(part, index) in parsedMessage" :key="index">
         <br v-if="part.isNewline" />
-        <a 
-          v-if="part.isBookTitle" 
-          href="#" 
+        <a
+          v-if="part.isBookTitle"
+          href="#"
           class="book-title"
-          @click.prevent="sendMessage(part.text)"
+          @click.prevent="sendMessage(part.title, part.author)"
         >
-          {{ part.text }}
+          {{ part.title }}
         </a>
+        <span v-if="part.isBookTitle && part.originalTitle">
+          {{ ` (${part.originalTitle}) - ${part.author}` }}
+        </span>
+        <span v-else-if="part.isBookTitle && part.originalTitle === null">
+          {{ ` - ${part.author}` }}
+        </span>
         <span v-else>{{ part.text }}</span>
       </template>
     </div>
@@ -37,89 +43,84 @@ export default {
   },
   computed: {
     parsedMessage() {
-      const text = this.message.text;
-      const parts = [];
-      
-      // 새로운 로직으로 메시지 파싱
-      const regex = /<<([^>]+)>>|(\d+\.)|\n\n/g;
-      let lastIndex = 0;
-      let match;
+      const text = this.message.text
+      const parts = []
+
+      const regex = /<<([^>]+)>>(?:\s*\(([^)]+)\))?\s*-\s*([^\n]+)|\n\n|(\d+\.)/g
+      let currentIndex = 0
+      let match
 
       while ((match = regex.exec(text)) !== null) {
-        // 이전 텍스트 추가
-        if (match.index > lastIndex) {
+        if (match.index > currentIndex) {
           parts.push({
-            text: text.substring(lastIndex, match.index),
+            text: text.substring(currentIndex, match.index),
             isBookTitle: false,
             isNewline: false
-          });
+          })
         }
 
-        // 숫자로 시작하는 부분 처리 (새 줄 추가)
-        if (match[2]) {
-          // 첫 번째 숫자일 때는 개행을 추가하지 않음
-          if (parts.length === 0 || parts[parts.length - 1].isNewline) {
-            parts.push({
-              text: match[0],
-              isBookTitle: false,
-              isNewline: false // 처음 숫자는 개행 없이 추가
-            });
-          } else {
-            parts.push({
-              text: match[0],
-              isBookTitle: false,
-              isNewline: true // 이후 숫자부터는 개행 추가
-            });
-          }
-        }
-
-        // 책 제목 처리
         if (match[1]) {
+          const title = match[1].trim()
+          const originalTitle = match[2] ? match[2].trim() : null
+          const author = match[3].trim()
+
+          console.log(`title: ${title}, originalTitle: ${originalTitle}`)
+
           parts.push({
-            text: match[1],
+            text: match[0],
+            title: title,
+            originalTitle: title === originalTitle ? null : originalTitle,
+            author: author,
             isBookTitle: true,
             isNewline: false
-          });
+          })
         }
-
-        // 이중 개행 처리
         if (match[0] === '\n\n') {
           parts.push({
             text: '',
             isBookTitle: false,
             isNewline: true
-          });
-          parts.push({
-            text: '',
-            isBookTitle: false,
-            isNewline: true
-          });
+          })
         }
 
-        lastIndex = match.index + match[0].length;
-      }
-
-      // 마지막 남은 텍스트 추가
-      if (lastIndex < text.length) {
+      if (match[4]) {
+        // 첫 번째 push: 텍스트 추가
         parts.push({
-          text: text.substring(lastIndex),
+          text: match[1],
           isBookTitle: false,
-          isNewline: false
+          isNewline: true 
+        });
+        parts.push({
+          text: match[4],
+          isBookTitle: false,
+          isNewline: false 
         });
       }
 
-      return parts;
+        currentIndex = match.index + match[0].length
+      }
+
+      if (currentIndex < text.length) {
+        parts.push({
+          text: text.substring(currentIndex),
+          isBookTitle: false,
+          isNewline: true
+        })
+      }
+
+      return parts
     }
   },
   methods: {
-    async sendMessage(bookTitle) {
+    async sendMessage(title, author) {
       try {
         await axios.post('http://43.200.4.199:80/api/book-title', {
-          title: bookTitle
-        });
-        router.push('/bookdetail');
+          title: title,
+          author: author
+        })
+        router.push('/bookdetail')
       } catch (error) {
-        console.error('메시지 전송 실패:', error);
+        console.error('메시지 전송 실패:', error)
       }
     }
   }

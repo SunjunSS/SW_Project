@@ -10,6 +10,7 @@
 </template>
 
 <script>
+import { nextTick } from 'vue'
 import PagesHeader from '../components/Bar/PagesHeader.vue'
 import axios from 'axios'
 import UserMessage from '../components/Chat/UserMessage.vue'
@@ -26,19 +27,26 @@ export default {
   data() {
     return {
       userInput: '',
-      messages: []
+      messages: JSON.parse(localStorage.getItem('chatMessages') || '[]')
     }
   },
   async created() {
     const initialMessage = this.$route.query.initialMessage
     if (initialMessage) {
-      this.sendMessage(initialMessage)
+      await this.sendMessage(initialMessage)
+      this.$router.replace({
+        path: this.$route.path,
+        query: {}
+      })
     }
   },
   watch: {
     messages: {
-      handler() {
-        this.$nextTick(() => this.scrollToBottom())
+      handler(newMessages) {
+        localStorage.setItem('chatMessages', JSON.stringify(newMessages))
+        nextTick(() => {
+          this.scrollToBottom()
+        })
       },
       deep: true
     }
@@ -52,6 +60,10 @@ export default {
           behavior: 'smooth'
         })
       }
+    },
+    clearChatHistory() {
+      this.messages = []
+      localStorage.removeItem('chatMessages')
     },
     async sendMessage(message = this.userInput.trim()) {
       if (!message) return
@@ -80,6 +92,11 @@ export default {
         })
       }
     }
+  },
+  mounted() {
+    nextTick(() => {
+      this.scrollToBottom()
+    })
   }
 }
 </script>

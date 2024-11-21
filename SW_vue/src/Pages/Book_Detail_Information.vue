@@ -1,5 +1,5 @@
 <template>
-<PagesHeader />
+  <PagesHeader />
   <div class="book-details-page">
     <div v-if="loading" class="loading">로딩 중...</div>
     <div v-else-if="error" class="error">{{ error }}</div>
@@ -12,9 +12,10 @@
             </div>
             <div class="book-content">
               <h2>{{ bookDetails.title }}</h2>
-              <p class="original-title">원제목: {{bookDetails.originalTitle }}</p>
+              <p class="original-title">원제목: {{ bookDetails.originalTitle }}</p>
               <div class="book-details">
-                <p><strong><v-icon icon="mdi-star" class="starLank"></v-icon></strong>
+                <p>
+                  <strong><v-icon icon="mdi-star" class="starLank"></v-icon></strong>
                   <span class="review-rank">{{ bookDetails.customerReviewRank }}</span>
                 </p>
                 <p><strong>장르:</strong> {{ bookDetails.categoryName }}</p>
@@ -25,8 +26,12 @@
                 <p><strong>출판사:</strong> {{ bookDetails.publisher }}</p>
               </div>
               <div class="book-pricing">
-                <p class="price original">정가: <span>{{ bookDetails.priceStandard }}원</span></p>
-                <p class="price discounted">판매가: <span>{{ bookDetails.priceSales }}원</span></p>
+                <p class="price original">
+                  정가: <span>{{ bookDetails.priceStandard }}원</span>
+                </p>
+                <p class="price discounted">
+                  판매가: <span>{{ bookDetails.priceSales }}원</span>
+                </p>
               </div>
               <div class="book-Link">
                 <a :href="bookDetails.link" target="_blank">구매링크</a>
@@ -44,12 +49,12 @@
 </template>
 
 <script>
-import axios from 'axios';
-import PagesHeader from '@/components/Bar/PagesHeader.vue';
+import axios from 'axios'
+import PagesHeader from '@/components/Bar/PagesHeader.vue'
 
 export default {
   components: {
-    PagesHeader,
+    PagesHeader
   },
   data() {
     return {
@@ -57,35 +62,40 @@ export default {
       loading: true,
       error: null,
       bookTitle: '', // 책 제목을 저장할 새로운 데이터 속성
-    };
+      author: ''
+    }
   },
   created() {
-    this.fetchBookDetails();
+    this.fetchBookDetails()
   },
   methods: {
     async fetchBookDetails() {
-      this.loading = true;
-      this.error = null;
+      this.loading = true
+      this.error = null
       try {
         // 서버에서 책 제목을 가져옴
-        const titleResponse = await axios.get('http://43.200.4.199/api/book-title');
-        this.bookTitle = titleResponse.data.title; // 받아온 책 제목 저장
-
+        const response = await axios.get('http://43.200.4.199/api/book-title')
+        this.bookTitle = response.data.title // 받아온 책 제목 저장
+        this.author = response.data.author
         const searchResponse = await axios.get('/api/ItemSearch.aspx', {
           params: {
             ttbkey: 'ttbzinzza1220952001',
-            Query: this.bookTitle, // 실제 책 제목으로 변경
-            QueryType: 'Title',
+            Query: `${this.bookTitle}+${this.author}`, // 실제 책 제목으로 변경
+            QueryType: 'Keyword',
             MaxResults: 1,
             start: 1,
             SearchTarget: 'Book',
             output: 'js',
-            Version: '20131101',
-          },
-        });
+            Version: '20131101'
+          }
+        })
 
-        if (searchResponse.data && searchResponse.data.item && searchResponse.data.item.length > 0) {
-          const itemId = searchResponse.data.item[0].itemId;
+        if (
+          searchResponse.data &&
+          searchResponse.data.item &&
+          searchResponse.data.item.length > 0
+        ) {
+          const itemId = searchResponse.data.item[0].itemId
 
           const detailResponse = await axios.get('/api/ItemLookUp.aspx', {
             params: {
@@ -94,12 +104,16 @@ export default {
               ItemIdType: 'ItemId',
               output: 'js',
               Version: '20131101',
-              OptResult: 'ebookList,usedList,reviewList',
-            },
-          });
+              OptResult: 'ebookList,usedList,reviewList'
+            }
+          })
 
-          if (detailResponse.data && detailResponse.data.item && detailResponse.data.item.length > 0) {
-            const item = detailResponse.data.item[0];
+          if (
+            detailResponse.data &&
+            detailResponse.data.item &&
+            detailResponse.data.item.length > 0
+          ) {
+            const item = detailResponse.data.item[0]
             this.bookDetails = {
               title: item.title,
               originalTitle: item.subInfo.originalTitle,
@@ -114,26 +128,26 @@ export default {
               cover: this.getHighResolutionImage(item.cover),
               publisher: item.publisher,
               customerReviewRank: item.customerReviewRank,
-              link: item.link,
-            };
+              link: item.link
+            }
           } else {
-            throw new Error('책 상세 정보를 찾을 수 없습니다.');
+            throw new Error('책 상세 정보를 찾을 수 없습니다.')
           }
         } else {
-          throw new Error('검색 결과가 없습니다.');
+          throw new Error('검색 결과가 없습니다.')
         }
       } catch (error) {
-        console.error('API 요청 중 오류 발생:', error);
-        this.error = '데이터를 불러오는 중 오류가 발생했습니다: ' + error.message;
+        console.error('API 요청 중 오류 발생:', error)
+        this.error = '데이터를 불러오는 중 오류가 발생했습니다: ' + error.message
       } finally {
-        this.loading = false;
+        this.loading = false
       }
     },
     getHighResolutionImage(url) {
-      return url.replace('coversum', 'cover');
+      return url.replace('coversum', 'cover')
     }
-  },
-};
+  }
+}
 </script>
 
 <style scoped>
@@ -193,8 +207,8 @@ h2 {
   color: #444;
 }
 
-.starLank{
-  color: #FFE400 !important;
+.starLank {
+  color: #ffe400 !important;
 }
 
 .price.original {
@@ -219,7 +233,8 @@ h2 {
   line-height: 1.6;
 }
 
-.loading, .error {
+.loading,
+.error {
   text-align: center;
   padding: 40px;
   font-size: 18px;
@@ -246,29 +261,30 @@ h2 {
     font-size: 1.3rem;
   }
 
-  .original-title{
+  .original-title {
     margin-bottom: 0.4rem;
   }
 
-  .book-details p{
+  .book-details p {
     margin: 0.3rem 0;
   }
 
-  .book-description{
-    margin-top: 2vh; 
+  .book-description {
+    margin-top: 2vh;
     padding-top: 2vh;
   }
 
-  .book-description h3{
-    font-size: 1.0rem;
+  .book-description h3 {
+    font-size: 1rem;
     margin-bottom: 0.2rem;
   }
 
-  .book-details p, .book-description p {
+  .book-details p,
+  .book-description p {
     font-size: 0.9rem;
   }
 
-  .book-pricing{
+  .book-pricing {
     margin: 0.4rem 0;
   }
 
@@ -281,12 +297,12 @@ h2 {
     font-size: 1.4rem;
   }
 
-  .review-rank{
+  .review-rank {
     display: inline-block;
     transform: translate(0.1rem, 0.12rem);
   }
 
-  .book-Link{
+  .book-Link {
     font-size: 0.9rem;
   }
 }
@@ -310,34 +326,35 @@ h2 {
     font-size: 1.4rem;
   }
 
-  .original-title{
+  .original-title {
     margin-bottom: 0.4rem;
   }
 
-  .book-details p{
+  .book-details p {
     margin: 0.3rem 0;
   }
 
-  .book-description{
-    margin-top: 2vh; 
+  .book-description {
+    margin-top: 2vh;
     padding-top: 2vh;
   }
 
-  .book-description h3{
+  .book-description h3 {
     font-size: 1.1rem;
     margin-bottom: 0.3rem;
   }
 
-  .book-details p, .book-description p {
+  .book-details p,
+  .book-description p {
     font-size: 0.8rem;
   }
 
-  .book-pricing{
+  .book-pricing {
     margin: 0.3rem 0;
   }
 
   .price {
-    font-size: 1.0rem;
+    font-size: 1rem;
     margin: 0.4rem 0;
   }
 
@@ -345,15 +362,14 @@ h2 {
     font-size: 1.3rem;
   }
 
-  .review-rank{
+  .review-rank {
     display: inline-block;
     transform: translate(0.1rem, 0.12rem);
   }
 
-  .book-Link{
+  .book-Link {
     font-size: 0.8rem;
   }
-
 }
 
 @media (min-width: 801px) {
@@ -375,29 +391,30 @@ h2 {
     font-size: 1.6rem;
   }
 
-  .original-title{
+  .original-title {
     margin-bottom: 0.6rem;
   }
 
-  .book-details p{
+  .book-details p {
     margin: 0.5rem 0;
   }
 
-  .book-description{
-    margin-top: 4vh; 
+  .book-description {
+    margin-top: 4vh;
     padding-top: 3vh;
   }
 
-  .book-description h3{
+  .book-description h3 {
     font-size: 1.15rem;
     margin-bottom: 0.4rem;
   }
 
-  .book-details p, .book-description p {
-    font-size: 1.0rem;
+  .book-details p,
+  .book-description p {
+    font-size: 1rem;
   }
 
-  .book-pricing{
+  .book-pricing {
     margin: 0.5rem 0;
   }
 
@@ -410,13 +427,13 @@ h2 {
     font-size: 1.6rem;
   }
 
-  .review-rank{
+  .review-rank {
     display: inline-block;
     transform: translate(0.2rem, 0.05rem);
   }
 
-  .book-Link{
-    font-size: 1.0rem;
+  .book-Link {
+    font-size: 1rem;
   }
 }
 </style>
