@@ -6,7 +6,8 @@
     @submit="handleSubmit"
   />
   <BookSlides />
-  <RecommendedBookSlides/>
+  <!-- <BookSlides /> -->
+  <RecommendedBookSlides />
   <PagesFooter />
 </template>
 
