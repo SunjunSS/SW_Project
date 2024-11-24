@@ -1,9 +1,6 @@
-<<<<<<< HEAD
 node_modules/
 .DS_Store
 ._.DS_Store
 **/.DS_Store
 **/._.DS_Store
-=======
-node_modules/
->>>>>>> kmkang
+SW_vue/.env

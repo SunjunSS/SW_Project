@@ -13,7 +13,11 @@ import PagesHeader from '@/components/Bar/PagesHeader.vue'
 export default {
   name: 'KakaoMap',
   components: {
-    PagesHeader // PagesHeader 컴포넌트를 등록
+    PagesHeader
+  },
+  created() {
+    // 로컬 스토리지 초기화
+    localStorage.removeItem('chatMessages')
   },
   data() {
     return {

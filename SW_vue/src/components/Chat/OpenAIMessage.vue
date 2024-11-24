@@ -2,17 +2,24 @@
   <div class="ai-message">
     <img class="profile-image" :src="profileImage" alt="AI" />
     <div class="message-text">
-      <span v-for="(part, index) in parsedMessage" :key="index">
-        <a 
-          v-if="part.isBookTitle" 
-          href="#" 
+      <template v-for="(part, index) in parsedMessage" :key="index">
+        <br v-if="part.isNewline" />
+        <a
+          v-if="part.isBookTitle"
+          href="#"
           class="book-title"
-          @click.prevent="sendMessage(part.text)"
+          @click.prevent="sendMessage(part.title, part.author)"
         >
-          {{ part.text }}
+          {{ part.title }}
         </a>
+        <span v-if="part.isBookTitle && part.originalTitle">
+          {{ ` (${part.originalTitle}) - ${part.author}` }}
+        </span>
+        <span v-else-if="part.isBookTitle && part.originalTitle === null">
+          {{ ` - ${part.author}` }}
+        </span>
         <span v-else>{{ part.text }}</span>
-      </span>
+      </template>
     </div>
   </div>
 </template>
@@ -36,52 +43,84 @@ export default {
   },
   computed: {
     parsedMessage() {
-      const text = this.message.text;
-      const parts = [];
-      let currentIndex = 0;
+      const text = this.message.text
+      const parts = []
 
-      // <<책제목>> 패턴을 찾아서 분리
-      const regex = /<<([^>]+)>>/g;
-      let match;
+      const regex = /<<([^>]+)>>(?:\s*\(([^)]+)\))?\s*-\s*([^\n]+)|\n\n|(\d+\.)/g
+      let currentIndex = 0
+      let match
 
       while ((match = regex.exec(text)) !== null) {
-        // 책 제목 앞의 일반 텍스트 추가
         if (match.index > currentIndex) {
           parts.push({
             text: text.substring(currentIndex, match.index),
-            isBookTitle: false
-          });
+            isBookTitle: false,
+            isNewline: false
+          })
         }
 
-        // 책 제목 추가
-        parts.push({
-          text: match[1], // << >> 기호를 제외한 실제 책 제목
-          isBookTitle: true
-        });
+        if (match[1]) {
+          const title = match[1].trim()
+          const originalTitle = match[2] ? match[2].trim() : null
+          const author = match[3].trim()
 
-        currentIndex = match.index + match[0].length;
+          console.log(`title: ${title}, originalTitle: ${originalTitle}`)
+
+          parts.push({
+            text: match[0],
+            title: title,
+            originalTitle: title === originalTitle ? null : originalTitle,
+            author: author,
+            isBookTitle: true,
+            isNewline: false
+          })
+        }
+        if (match[0] === '\n\n') {
+          parts.push({
+            text: '',
+            isBookTitle: false,
+            isNewline: true
+          })
+        }
+
+        if (match[4]) {
+          // 첫 번째 push: 텍스트 추가
+          parts.push({
+            text: match[1],
+            isBookTitle: false,
+            isNewline: true
+          })
+          parts.push({
+            text: match[4],
+            isBookTitle: false,
+            isNewline: false
+          })
+        }
+
+        currentIndex = match.index + match[0].length
       }
 
-      // 마지막 남은 텍스트 추가
       if (currentIndex < text.length) {
         parts.push({
           text: text.substring(currentIndex),
-          isBookTitle: false
-        });
+          isBookTitle: false,
+          isNewline: true
+        })
       }
 
-      return parts;
+      return parts
     }
   },
   methods: {
-    async sendMessage(bookTitle) {
+    async sendMessage(title, author) {
       try {
         await axios.post('http://43.200.4.199:80/api/book-title', {
-          title: bookTitle
-        });
-        router.push('/bookdetail');
+          title: title,
+          author: author
+        })
+        router.push('/bookdetail')
       } catch (error) {
-        console.error('메시지 전송 실패:', error);
+        console.error('메시지 전송 실패:', error)
       }
     }
   }
