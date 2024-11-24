@@ -12,6 +12,9 @@
             </div>
             <div class="book-content">
               <h2>{{ bookDetails.title }}</h2>
+                <button class="like-button" @click="toggleLike">
+                  <v-icon :icon="isLiked ? 'mdi-heart' : 'mdi-heart-outline'" class="heart-icon" />
+                </button>
               <p class="original-title">원제목: {{ bookDetails.originalTitle }}</p>
               <div class="book-details">
                 <p>
@@ -61,8 +64,9 @@ export default {
       bookDetails: {},
       loading: true,
       error: null,
-      bookTitle: '', // 책 제목을 저장할 새로운 데이터 속성
-      author: ''
+      bookTitle: '',
+      author: '',
+      isLiked: false,
     }
   },
   created() {
@@ -73,14 +77,14 @@ export default {
       this.loading = true
       this.error = null
       try {
-        // 서버에서 책 제목을 가져옴
         const response = await axios.get('http://43.200.4.199/api/book-title')
-        this.bookTitle = response.data.title // 받아온 책 제목 저장
+        this.bookTitle = response.data.title
         this.author = response.data.author
+
         const searchResponse = await axios.get('/api/ItemSearch.aspx', {
           params: {
             ttbkey: 'ttbzinzza1220952001',
-            Query: `${this.bookTitle}+${this.author}`, // 실제 책 제목으로 변경
+            Query: `${this.bookTitle}+${this.author}`,
             QueryType: 'Keyword',
             MaxResults: 1,
             start: 1,
@@ -90,11 +94,7 @@ export default {
           }
         })
 
-        if (
-          searchResponse.data &&
-          searchResponse.data.item &&
-          searchResponse.data.item.length > 0
-        ) {
+        if (searchResponse.data && searchResponse.data.item && searchResponse.data.item.length > 0) {
           const itemId = searchResponse.data.item[0].itemId
 
           const detailResponse = await axios.get('/api/ItemLookUp.aspx', {
@@ -108,11 +108,7 @@ export default {
             }
           })
 
-          if (
-            detailResponse.data &&
-            detailResponse.data.item &&
-            detailResponse.data.item.length > 0
-          ) {
+          if (detailResponse.data && detailResponse.data.item && detailResponse.data.item.length > 0) {
             const item = detailResponse.data.item[0]
             this.bookDetails = {
               title: item.title,
@@ -130,6 +126,8 @@ export default {
               customerReviewRank: item.customerReviewRank,
               link: item.link
             }
+            // 책 상세 정보를 가져온 후 좋아요 상태 확인
+            await this.checkLikeStatus()
           } else {
             throw new Error('책 상세 정보를 찾을 수 없습니다.')
           }
@@ -143,6 +141,40 @@ export default {
         this.loading = false
       }
     },
+    async toggleLike() {
+      try {
+        if (this.isLiked) {
+          // 좋아요 취소
+          const response = await axios.delete(`http://43.200.4.199/api/books/unlike/${this.bookDetails.isbn13}`)
+          console.log('좋아요 취소 응답:', response.data)
+          this.isLiked = false
+        } else {
+          // 좋아요 추가
+          const data = {
+            title: this.bookDetails.title,
+            author: this.bookDetails.author,
+            ISBN13: this.bookDetails.isbn13,
+            genre: this.bookDetails.categoryName,
+            price_standard: this.bookDetails.priceStandard,
+            pricesales: this.bookDetails.priceSales
+          }
+          const response = await axios.post('http://43.200.4.199/api/books/like', data)
+          console.log('좋아요 추가 응답:', response.data)
+          this.isLiked = true
+        }
+      } catch (error) {
+        console.error('좋아요 토글 중 오류:', error)
+        // 에러 처리를 추가할 수 있습니다
+      }
+    },
+    async checkLikeStatus() {
+      try {
+        const response = await axios.get(`http://43.200.4.199/api/books/like-status/${this.bookDetails.isbn13}`)
+        this.isLiked = response.data.isLiked
+      } catch (error) {
+        console.error('좋아요 상태 확인 중 오류:', error)
+      }
+    },
     getHighResolutionImage(url) {
       return url.replace('coversum', 'cover')
     }
@@ -151,6 +183,29 @@ export default {
 </script>
 
 <style scoped>
+.like-button {
+  background-color: transparent;
+  border-radius: 50%;
+  padding: 5px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background-color 0.3s, color 0.3s;
+}
+
+.heart-icon {
+  color: red;
+}
+
+.like-button:active {
+  background-color: red;
+}
+
+.like-button.is-liked {
+  color: white;
+}
+
 .book-details-page {
   font-family: 'Noto Sans KR', sans-serif;
   background-color: #f5f5f5;
@@ -240,6 +295,7 @@ h2 {
   font-size: 18px;
   color: #666;
 }
+
 
 /* Media Queries */
 @media (max-width: 500px) {
