@@ -12,9 +12,9 @@
             </div>
             <div class="book-content">
               <h2>{{ bookDetails.title }}</h2>
-                <button class="like-button" @click="toggleLike">
-                  <v-icon :icon="isLiked ? 'mdi-heart' : 'mdi-heart-outline'" class="heart-icon" />
-                </button>
+              <button class="like-button" @click="toggleLike">
+                <v-icon :icon="isLiked ? 'mdi-heart' : 'mdi-heart-outline'" class="heart-icon" />
+              </button>
               <p class="original-title">원제목: {{ bookDetails.originalTitle }}</p>
               <div class="book-details">
                 <p>
@@ -66,7 +66,7 @@ export default {
       error: null,
       bookTitle: '',
       author: '',
-      isLiked: false,
+      isLiked: false
     }
   },
   created() {
@@ -94,7 +94,11 @@ export default {
           }
         })
 
-        if (searchResponse.data && searchResponse.data.item && searchResponse.data.item.length > 0) {
+        if (
+          searchResponse.data &&
+          searchResponse.data.item &&
+          searchResponse.data.item.length > 0
+        ) {
           const itemId = searchResponse.data.item[0].itemId
 
           const detailResponse = await axios.get('/api/ItemLookUp.aspx', {
@@ -108,7 +112,11 @@ export default {
             }
           })
 
-          if (detailResponse.data && detailResponse.data.item && detailResponse.data.item.length > 0) {
+          if (
+            detailResponse.data &&
+            detailResponse.data.item &&
+            detailResponse.data.item.length > 0
+          ) {
             const item = detailResponse.data.item[0]
             this.bookDetails = {
               title: item.title,
@@ -145,7 +153,9 @@ export default {
       try {
         if (this.isLiked) {
           // 좋아요 취소
-          const response = await axios.delete(`http://43.200.4.199/api/books/unlike/${this.bookDetails.isbn13}`)
+          const response = await axios.delete(
+            `http://43.200.4.199/api/books/unlike/${this.bookDetails.isbn13}`
+          )
           console.log('좋아요 취소 응답:', response.data)
           this.isLiked = false
         } else {
@@ -156,6 +166,7 @@ export default {
             ISBN13: this.bookDetails.isbn13,
             genre: this.bookDetails.categoryName,
             price_standard: this.bookDetails.priceStandard,
+            cover: this.bookDetails.cover,
             pricesales: this.bookDetails.priceSales
           }
           const response = await axios.post('http://43.200.4.199/api/books/like', data)
@@ -169,7 +180,9 @@ export default {
     },
     async checkLikeStatus() {
       try {
-        const response = await axios.get(`http://43.200.4.199/api/books/like-status/${this.bookDetails.isbn13}`)
+        const response = await axios.get(
+          `http://43.200.4.199/api/books/like-status/${this.bookDetails.isbn13}`
+        )
         this.isLiked = response.data.isLiked
       } catch (error) {
         console.error('좋아요 상태 확인 중 오류:', error)
@@ -191,7 +204,9 @@ export default {
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: background-color 0.3s, color 0.3s;
+  transition:
+    background-color 0.3s,
+    color 0.3s;
 }
 
 .heart-icon {
@@ -295,7 +310,6 @@ h2 {
   font-size: 18px;
   color: #666;
 }
-
 
 /* Media Queries */
 @media (max-width: 500px) {

@@ -1,10 +1,10 @@
 <template>
   <div v-if="isLoggedIn" class="recommended-header">
-    <h1>
+    <h1 style="margin-bottom: 15px">
       <span class="user-name">{{ currentUser.name }}</span
       >님을 위한 추천 도서
     </h1>
-    <h3 style="color: gray">&nbsp;</h3>
+    <!-- <h3 style="color: gray">&nbsp;</h3> -->
   </div>
 
   <v-sheet class="mx-auto" elevation="8">
