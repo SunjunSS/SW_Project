@@ -4,8 +4,8 @@
   <div class="book-list">
     <div class="liked-book" v-for="book in likedList" :key="book.isbn13">
       <img :src="book.cover" alt="책 이미지" />
-      <h3>{{ book.title.split(/\(|-/)[0] }}</h3>
-      <h3>{{ book.author.split('(지은이)')[0] }}</h3>
+      <h4>{{ book.title.split(/\(|-/)[0] }}</h4>
+      <h4>{{ book.author.split('(지은이)')[0] }}</h4>
       <button class="deleteBtn" @click="deleteBook(book.ISBN13)" />
     </div>
   </div>
